@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://unpkg.com/vue"></script>
+    <style>
+        .container {
+         display: flex; /*Utilizei flexbox ao invés de css grid porque a lista é unidimensional.
+         Se o layout fosse bidimensional, seria melhor usar CSS grid ou uma combiação dos dois*/
+         flex-flow: column nowrap;
+         justify-content: center;
+        }      
+
+        .item {
+            background-image: url('backstars.jpg');
+            width:auto;
+            height: 100px;
+            margin: 2px;
+            text-align: center;
+            line-height: 100px;
+            font-weight: bold;
+            font-family: Helvetica, sans-serif;
+            font-size: 1em;
+            color: 	#536878;
+        }
+
+        .dropdown{
+            margin-left: 35%;
+            padding: 12px 30px; 
+            font-family: Arial, Helvetica, sans-serif; 
+            font-size:16px;
+            background-color: black; 
+            border-color: white; 
+            color: white;
+        }
+
+        @media only screen and (max-width: 768px){
+            .container {
+                justify-content: left;
+            }
+            .item {
+                text-align: left;
+    
+            }
+            .dropdown{
+                margin-left: 4.2%;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" style="background-color: black;">
+        <img src="starwars.png" style=" display: block; margin-left: auto; margin-right: auto;">
+       <div class="container">
+         <div class="item" v-for="person in personagens" v-bind:style="{color:person.eye_color}" style=" font-family: Avenir, Helvetica, sans-serif; font-size: 28px;"> <personagem :personagem="person"></personagem>
+         </div>  
+        </div>
+        <select class="dropdown" v-model="selected">
+                <option disabled value="">Escolha um personagem</option>
+                <option v-for="option in personagens" v-bind:value="option">
+                   {{ option.name }}
+                </option>
+            </select>
+            <button v-on:click="removeFromList(selected)" style="margin:20px; background-color: black; border-color: white; color: white; padding: 10px 24px;border-radius: 4px; font-size: 18px; font-family: Arial, Helvetica, sans-serif;">Retirar da Lista</button>
+    </div>
+    
+    <script>
+        "use strict"
+        
+        Vue.component("personagem",{
+            props: ["personagem"],
+            template: '<div><span v-html="personagem.name" ></span><button v-on:click="removeFromList(personagem)" style="margin:20px; background-color: black; border-color: white; color: white; padding: 10px 24px;border-radius: 4px;font-size: 18px;font-family: Arial, Helvetica, sans-serif;">Retirar da Lista</button></div>',
+            methods: {
+                removeFromList: function(personagem){ 
+                    for( var i = 0; i < app.personagens.length; i++) { 
+                        if ( app.personagens[i] === personagem) {
+                            app.personagens.splice(i, 1);
+                            break;
+                        }
+                    } 
+
+                }
+            }
+        })
+
+
+       
+        var app = new Vue({
+            el:"#app",
+            data: {
+                selected: "",
+                personagens: []
+                
+            },
+            
+            created: function() {
+                var vm = this
+                fetch('https://swapi.co/api/people/')
+                    .then(response => response.json())
+                    .then(json => {
+                        vm.personagens=json.results.sort((a, b) => {
+                            return a.name.localeCompare(b.name);
+                        });
+                        json.results.forEach(element => {
+                            console.log(element.name)
+                        });
+                    })
+                const request = new Request('https://swapi.co/api/people/');
+            },
+            methods: {
+                removeFromList: function(personagem){ 
+                    for( var i = 0; i < app.personagens.length; i++) { 
+                        if ( app.personagens[i] === personagem) {
+                            app.personagens.splice(i, 1);
+                            break;
+                        }
+                    } 
+                }
+            }         
+            
+        })
+        </script>
+    </body>
+    </html>
